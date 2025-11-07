@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ĐÃ VÀO ĐƯỢC!</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="https://tse4.mm.bing.net/th/id/OIP.vA5LHpsWN17cQEV94gJBngHaGG?rs=1&pid=ImgDetMain&o=7&rm=3">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Chào Mừng Lên Tàu!</h1>
+            <center><img src="https://th.bing.com/th/id/R.16cf532b38aa20e394de2b1cd89eb964?rik=KwB%2ff7PSNKan8A&pid=ImgRaw&r=0" width="200" height="200" alt="" class="meme-img"></center>
+            
+            <div id="loader-container">
+                <h3>ĐANG TRUY XUẤT DATABASE...</h3>
+                <div class="fake-loader">
+                    <div class="fake-progress" id="fake-progress-bar"></div>
+                </div>
+                <p id="loading-text">ĐANG HACK DATABASE... 0%</p>
+            </div>
+
+            <div id="main-content" style="display: none;">
+                <h3>Thông tin CÁ NHÂN của bạn:</h3>
+                <div id="user-data"><pre>...</pre></div>
+                
+                <hr style="border: 1px dashed magenta; margin: 30px 0;">
+                
+                <h3>(Admin) Toàn bộ Database:</h3>
+                <button id="show-all-button" style="background-color: #00ffff; color: #111; border-color: #111;">
+                    BẤM VÀO ĐỂ XEM TẤT CẢ
+                </button>
+                <div id="all-users-data" style="display: none; margin-top: 15px; overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr><th>ID</th><th>Username</th><th>Họ và Tên</th><th>Lớp</th></tr>
+                        </thead>
+                        <tbody id="all-users-table-body"></tbody>
+                    </table>
+                </div>
+                
+                <button id="logout-button" style="margin-top: 20px; background-color: #ff3b3b; border-color: yellow;">THOÁT RA!</button>
+            </div>
+        </div>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const token = localStorage.getItem('access_token');
+                
+                const loaderContainer = document.getElementById('loader-container');
+                const mainContent = document.getElementById('main-content');
+                const progressBar = document.getElementById('fake-progress-bar');
+                const loadingText = document.getElementById('loading-text');
+
+                if (!token) {
+                    alert('LÀM GÌ ĐẤY! Chưa đăng nhập mà đòi vào à?');
+                    window.location.href = 'login.html';
+                    return; 
+                }
+
+                let progress = 0;
+                const loadingMessages = [
+                    "ĐANG HACK DATABASE... 10%", "VƯỢT TƯỜNG LỬA... 30%",
+                    "GIẢI MÃ MẬT KHẨU... 50%", "LẤY CẮP DỮ LIỆU... 70%",
+                    "ĐANG CHUYỂN TIỀN... 90%", "HACK THÀNH CÔNG! 100%"
+                ];
+
+                const interval = setInterval(() => {
+                    progress += 20; 
+                    if (progress > 100) progress = 100;
+                    
+                    progressBar.style.width = progress + '%';
+                    loadingText.textContent = loadingMessages[Math.floor((progress - 1) / 20)];
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            loaderContainer.style.display = 'none'; 
+                            mainContent.style.display = 'block'; 
+                            loadRealData();
+                        }, 500);
+                    }
+                }, 500); 
+
+                setInterval(() => {
+                    document.title = (document.title === 'BẠN ĐANG BỊ THEO DÕI') 
+                                     ? '!!! (O_O) !!!' : 'BẠN ĐANG BỊ THEO DÕI';
+                }, 1000); 
+
+                function loadRealData() {
+                    const userDataDiv = document.getElementById('user-data');
+                    const logoutButton = document.getElementById('logout-button');
+                    const showAllButton = document.getElementById('show-all-button');
+                    const tableBody = document.getElementById('all-users-table-body');
+                    const allUsersDataDiv = document.getElementById('all-users-data');
+
+                    fetch('http://localhost:5000/data', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) { 
+                            userDataDiv.innerHTML = `<pre style="color: red;">${data.message}</pre>`;
+                            return;
+                        }
+                        userDataDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                    })
+                    .catch(error => { console.error("Error:", error); });
+                    
+                    logoutButton.addEventListener('click', () => {
+                        localStorage.removeItem('access_token');
+                        alert('Đã đăng xuất! Tạm biệt!');
+                        window.location.href = 'login.html';
+                    });
+                    
+                    showAllButton.addEventListener('click', () => {
+                        allUsersDataDiv.style.display = 'block';
+                        tableBody.innerHTML = '<tr><td colspan="4">Đang tải...</td></tr>';
+                        
+                        fetch('http://localhost:5000/admin/all_users', {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message) { 
+                                tableBody.innerHTML = `<tr><td colspan="4" style="color: red;">${data.message}</td></tr>`;
+                                return;
+                            }
+                            tableBody.innerHTML = '';
+                            data.all_users.forEach(user => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${user.id}</td>
+                                    <td>${user.username}</td>
+                                    <td>${user.name || 'N/A'}</td>
+                                    <td>${user.class || 'N/A'}</td>
+                                `;
+                                tableBody.appendChild(row);
+                            });
+                        })
+                        .catch(error => { console.error("Error:", error); });
+                    });
+                }
+            });
+        </script>
+    </body>
+</html>
