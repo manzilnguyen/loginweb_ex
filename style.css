@@ -1,126 +1,136 @@
+@import 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@600;700&display=swap';
+@import 'https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css';
+@import 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css';
+
+:root {
+    --pico-font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --pico-h-font-weight: 700;
+    
+    --pico-primary: #4338ca;
+    --pico-primary-hover: #4f46e5;
+    --pico-primary-focus: #4f46e5;
+    --pico-primary-inverse: #ffffff;
+}
+
+[data-theme="dark"] {
+    --pico-primary: #818cf8;
+    --pico-primary-hover: #a5b4fc;
+    --pico-primary-focus: #a5b4fc;
+    --pico-primary-inverse: #000000;
+}
+
+html, body {
+    font-family: var(--pico-font-family);
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', var(--pico-font-family);
+    font-weight: 700;
+}
+
 body {
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
-    background-color: #111;
-    color: #f0f0f0;
-    overflow-x: hidden; 
+    background: #f8f9fa;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #f8f9fa 100%);
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
 }
-.container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 30px;
-    background-color: #222;
-    border: 5px solid magenta;
-    border-radius: 15px;
-    box-shadow: 0 0 20px magenta, 0 0 30px lime inset;
-    text-align: center;
+[data-theme="dark"] body {
+    background: #11191f;
+    background: linear-gradient(180deg, #1f2937 0%, #11191f 100%);
 }
-h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    background: linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: rainbow-text 3s linear infinite;
+body.fade-in {
+    opacity: 1;
 }
-.meme-img {
-    width: 150px;
-    height: 150px;
-    margin: 20px 0;
-    animation: spin 5s linear infinite;
+
+nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--pico-card-background-color);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    padding: 0.75rem var(--pico-spacing);
 }
-input[type="text"], input[type="password"] {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    box-sizing: border-box;
-    background: #333;
-    color: lime;
-    border: 2px solid lime;
-    border-radius: 5px;
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
+[data-theme="dark"] nav {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+nav ul {
+    margin: 0;
+}
+nav ul li.brand {
+    font-family: 'Poppins', var(--pico-font-family);
+    font-weight: 700;
     font-size: 1.1rem;
+    color: var(--pico-primary);
 }
-input[type="text"]:focus, input[type="password"]:focus {
-    outline: none;
-    box-shadow: 0 0 15px lime;
+
+main {
+    padding-top: 2rem;
 }
-button, input[type="submit"] {
-    width: 100%;
-    padding: 15px;
-    background-color: #ff00ff;
-    color: yellow;
-    border: 3px solid yellow;
-    border-radius: 10px;
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
-    font-size: 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s ease;
+
+main.container, 
+section.container,
+main.container-fluid {
+    background: var(--pico-card-background-color);
+    border-radius: var(--pico-card-border-radius);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
-button:hover, input[type="submit"]:hover {
-    transform: scale(1.05) rotate(3deg); 
-    background-color: yellow;
-    color: #ff00ff;
-    box-shadow: 0 0 20px yellow;
+main.container-fluid {
+    max-width: 1100px;
+    padding-bottom: 2rem;
 }
-button:active, input[type="submit"]:active {
-    transform: scale(0.9) rotate(-5deg);
+main.container {
+    max-width: 550px;
+    margin-top: 3rem;
 }
-p { color: #ccc; }
-a { color: #00ffff; text-decoration: none; transition: all 0.2s ease; }
-a:hover { color: #ff00ff; text-decoration: underline; transform: scale(1.1); display: inline-block; }
+
+[data-theme="dark"] main.container,
+[data-theme="dark"] section.container,
+[data-theme="dark"] main.container-fluid {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--pico-card-border-color);
+}
+
+button,
+[role="button"] {
+    transition: all 0.2s ease-in-out;
+}
+button:hover,
+[role="button"]:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+button:active,
+[role="button"]:active {
+    transform: translateY(-1px);
+}
+
 .message {
-    font-size: 1.1rem;
-    font-weight: bold;
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 5px;
-    display: none; 
+    font-weight: 500;
+    padding: 0.75rem;
+    border-radius: var(--pico-border-radius);
+    margin-top: 1rem;
+    display: none;
+    animation: fadeIn 0.5s;
 }
-.message.success { background-color: #1a531a; color: lime; display: block; }
-.message.error { background-color: #6b1a1a; color: #ff4d4d; display: block; }
-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
-th { background-color: #ff00ff; color: yellow; padding: 12px; border: 3px solid yellow; text-transform: uppercase; }
-td { padding: 10px; border: 2px solid #555; text-align: left; color: #f0f0f0; }
-tbody tr:nth-child(even) { background-color: #333; }
-tbody tr:hover { background-color: #444; color: lime; }
-.form-shake {
-    animation: shake 0.5s linear;
+.message.show {
+    display: block;
 }
-.running-button {
-    position: relative; 
-    transition: top 0.2s ease, left 0.2s ease; 
+.message.success {
+    background-color: var(--pico-color-green-100);
+    border-left: 5px solid var(--pico-color-green-400);
+    color: var(--pico-color-green-700);
 }
-.fake-loader {
-    width: 100%;
-    background-color: #333;
-    border: 2px solid lime;
-    border-radius: 5px;
-    padding: 3px;
-    text-align: center;
+[data-theme="dark"] .message.success {
+    background-color: #052e16;
+    color: var(--pico-color-green-200);
+    border-left-color: var(--pico-color-green-600);
 }
-.fake-progress {
-    width: 1%; 
-    height: 30px;
-    background-color: lime;
-    border-radius: 3px;
-    animation: pulse 1s infinite;
+.message.error {
+    background-color: var(--pico-color-red-100);
+    border-left: 5px solid var(--pico-color-red-400);
+    color: var(--pico-color-red-700);
 }
-#loading-text {
-    font-size: 1.2rem;
-    color: lime;
-    margin-top: 10px;
-}
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes rainbow-text { to { background-position: 200% center; } }
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px) rotate(-2deg); }
-    20%, 40%, 60%, 80% { transform: translateX(10px) rotate(2deg); }
-}
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+[data-theme="dark"] .message.error {
+    background-color: #450a0a;
+    color: var(--pico-color-red-200);
+    border-left-color: var(--pico-color-red-600);
 }

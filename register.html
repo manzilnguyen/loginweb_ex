@@ -1,75 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
     <head>
-        <title>Register to login!</title>
+        <title>Đăng Ký Tài Khoản</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" type="image/x-icon" href="https://tse4.mm.bing.net/th/id/OIP.vA5LHpsWN17cQEV94gJBngHaGG?rs=1&pid=ImgDetMain&o=7&rm=3">
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div class="container">
-            <h1>Tạo Tài Khoản Mới</h1>
-            <center><img src="https://tse1.mm.bing.net/th/id/OIP.S-5CVdel0Fk0sR0pBBjzlwHaFa?w=768&h=561&rs=1&pid=ImgDetMain&o=7&rm=3" width="150" height="150" alt="" class="meme-img"></center>
+        <main class="container animate__animated animate__fadeInUp">
+            <hgroup>
+                <h1>Đăng Ký</h1>
+                <h2>Tạo tài khoản mới để tiếp tục</h2>
+            </hgroup>
             
             <form id="register-form">
-                <label for="new-username">Username:</label>
-                <input type="text" id="new-username" name="new-username" required placeholder="tên gì cũng được...">
+                <label for="new-username">
+                    Tên đăng nhập (Bắt buộc)
+                    <input type="text" id="new-username" name="new-username" placeholder="Ví dụ: mrbeast" required>
+                </label>
                 
-                <label for="new-password">Password:</label>
-                <input type="password" id="new-password" name="new-password" required placeholder="dễ nhớ thôi...">
+                <label for="new-password">
+                    Mật khẩu (Bắt buộc)
+                    <input type="password" id="new-password" name="new-password" placeholder="••••••••" required>
+                </label>
                 
-                <label for="new-name">Họ và Tên:</label>
-                <input type="text" id="new-name" name="new-name" placeholder="tên thật nè...">
-
-                <label for="new-class">Lớp:</label>
-                <input type="text" id="new-class" name="new-class" placeholder="lớp mấy... khai mau...">
+                <div class="grid">
+                    <label for="new-name">
+                        Họ và Tên
+                        <input type="text" id="new-name" name="new-name" placeholder="Tên của bạn">
+                    </label>
+                    <label for="new-class">
+                        Lớp
+                        <input type="text" id="new-class" name="new-class" placeholder="Ví dụ: 12A1">
+                    </label>
+                </div>
                 
-                <input type="submit" value="TẠO NGAY!" id="troll-button" class="running-button">
+                <button type="submit" id="submit-button">Đăng Ký</button>
             </form>
             
             <p id="register-message" class="message"></p>
-            <p>Có rồi thì? <a href="login.html">Đăng nhập đi</a>.</p>
-        </div>
+            
+            <footer>
+                <p>Đã có tài khoản? <a href="login.html">Đăng nhập tại đây</a>.</p>
+            </footer>
+        </main>
         
         <script>
             document.addEventListener('DOMContentLoaded', () => {
+                document.body.classList.add('fade-in');
+                
                 const registerForm = document.getElementById('register-form');
                 const registerMessage = document.getElementById('register-message');
-                
-                const trollButton = document.getElementById('troll-button');
-                let trollCount = 0; 
-                const maxTrolls = 5;
-
-                const moveButton = () => {
-                    if (trollCount >= maxTrolls) {
-                        trollButton.value = "HẾT VUI RỒI! BẤM ĐI!";
-                        return; 
-                    }
-                    trollCount++;
-                    
-                    const containerRect = trollButton.parentNode.getBoundingClientRect();
-                    const buttonRect = trollButton.getBoundingClientRect();
-                    const newTop = Math.random() * (containerRect.height - buttonRect.height);
-                    const newLeft = Math.random() * (containerRect.width - buttonRect.width);
-                    
-                    trollButton.style.top = `${newTop}px`;
-                    trollButton.style.left = `${newLeft}px`;
-                    
-                    if (trollCount === 1) trollButton.value = "CHẠM TAO NÈ!";
-                    if (trollCount === 3) trollButton.value = "HAHA NGU VẬY?";
-                };
-                
-                trollButton.addEventListener('mouseover', moveButton);
-                trollButton.addEventListener('click', (event) => {
-                    if (trollCount < maxTrolls) {
-                        event.preventDefault(); 
-                        moveButton(); 
-                    }
-                });
+                const submitButton = document.getElementById('submit-button');
 
                 registerForm.addEventListener('submit', (event) => {
                     event.preventDefault(); 
+                    
+                    submitButton.setAttribute('aria-busy', 'true');
+                    submitButton.textContent = 'Đang xử lý...';
+                    registerMessage.classList.remove('show', 'success', 'error');
+                    
                     const username = document.getElementById('new-username').value;
                     const password = document.getElementById('new-password').value;
                     const name = document.getElementById('new-name').value;
@@ -87,13 +77,22 @@
                     .then(data => {
                         registerMessage.textContent = data.message;
                         if (data.message === 'Đăng ký thành công!') {
-                            registerMessage.className = 'message success';
-                            setTimeout(() => { window.location.href = "login.html"; }, 1000);
+                            registerMessage.className = 'message success show';
+                            document.body.classList.remove('fade-in');
+                            setTimeout(() => { window.location.href = "login.html"; }, 500);
                         } else {
-                            registerMessage.className = 'message error';
+                            registerMessage.className = 'message error show';
                         }
                     })
-                    .catch(error => { console.error('Error:', error); });
+                    .catch(error => {
+                        console.error('Error:', error);
+                        registerMessage.textContent = 'Lỗi kết nối máy chủ.';
+                        registerMessage.className = 'message error show';
+                    })
+                    .finally(() => {
+                        submitButton.removeAttribute('aria-busy');
+                        submitButton.textContent = 'Đăng Ký';
+                    });
                 });
             });
         </script>

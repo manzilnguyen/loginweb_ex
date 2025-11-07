@@ -1,146 +1,167 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
     <head>
-        <title>ĐÃ VÀO ĐƯỢC!</title>
+        <title>Trang Quản Trị</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" type="image/x-icon" href="https://tse4.mm.bing.net/th/id/OIP.vA5LHpsWN17cQEV94gJBngHaGG?rs=1&pid=ImgDetMain&o=7&rm=3">
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div class="container">
-            <h1>Chào Mừng Lên Tàu!</h1>
-            <center><img src="https://th.bing.com/th/id/R.16cf532b38aa20e394de2b1cd89eb964?rik=KwB%2ff7PSNKan8A&pid=ImgRaw&r=0" width="200" height="200" alt="" class="meme-img"></center>
-            
-            <div id="loader-container">
-                <h3>ĐANG TRUY XUẤT DATABASE...</h3>
-                <div class="fake-loader">
-                    <div class="fake-progress" id="fake-progress-bar"></div>
-                </div>
-                <p id="loading-text">ĐANG HACK DATABASE... 0%</p>
-            </div>
+        <nav>
+            <ul>
+                <li class="brand">MyApp</li>
+            </ul>
+            <ul>
+                <li><a href="#" id="logout-button" role="button" class="contrast">Đăng Xuất</a></li>
+            </ul>
+        </nav>
 
-            <div id="main-content" style="display: none;">
-                <h3>Thông tin CÁ NHÂN của bạn:</h3>
-                <div id="user-data"><pre>...</pre></div>
+        <main class="container-fluid animate__animated animate__fadeInUp"> 
+            
+            <header>
+                <hgroup>
+                    <h1>Bảng điều khiển</h1>
+                    <h2 id="welcome-message">Chào mừng trở lại!</h2>
+                </hgroup>
+            </header>
+
+            <article>
+                <header><strong>Thông tin cá nhân của bạn</strong></header>
+                <div id="user-data">
+                    <p aria-busy="true">Đang tải thông tin...</p>
+                </div>
+            </article>
+            
+            <hr>
+
+            <section>
+                <hgroup>
+                    <h3>Quản lý Người Dùng</h3>
+                    <h5>Toàn bộ người dùng trong hệ thống</h5>
+                </hgroup>
                 
-                <hr style="border: 1px dashed magenta; margin: 30px 0;">
-                
-                <h3>(Admin) Toàn bộ Database:</h3>
-                <button id="show-all-button" style="background-color: #00ffff; color: #111; border-color: #111;">
-                    BẤM VÀO ĐỂ XEM TẤT CẢ
+                <button id="show-all-button" class="secondary">
+                    Tải Toàn Bộ Database
                 </button>
-                <div id="all-users-data" style="display: none; margin-top: 15px; overflow-x: auto;">
-                    <table>
+                
+                <div id="all-users-data" style="display: none; margin-top: 1rem; overflow-x: auto;">
+                    <p id="table-message" class="message"></p>
+                    <table id="users-table">
                         <thead>
-                            <tr><th>ID</th><th>Username</th><th>Họ và Tên</th><th>Lớp</th></tr>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Họ và Tên</th>
+                                <th>Lớp</th>
+                            </tr>
                         </thead>
-                        <tbody id="all-users-table-body"></tbody>
+                        <tbody id="all-users-table-body">
+                        </tbody>
                     </table>
                 </div>
-                
-                <button id="logout-button" style="margin-top: 20px; background-color: #ff3b3b; border-color: yellow;">THOÁT RA!</button>
-            </div>
-        </div>
+            </section>
+        </main>
         
         <script>
             document.addEventListener('DOMContentLoaded', () => {
+                document.body.classList.add('fade-in');
+                
                 const token = localStorage.getItem('access_token');
                 
-                const loaderContainer = document.getElementById('loader-container');
-                const mainContent = document.getElementById('main-content');
-                const progressBar = document.getElementById('fake-progress-bar');
-                const loadingText = document.getElementById('loading-text');
+                const userDataDiv = document.getElementById('user-data');
+                const logoutButton = document.getElementById('logout-button');
+                const showAllButton = document.getElementById('show-all-button');
+                const allUsersDataDiv = document.getElementById('all-users-data');
+                const tableBody = document.getElementById('all-users-table-body');
+                const tableMessage = document.getElementById('table-message');
+                const welcomeMessage = document.getElementById('welcome-message');
 
                 if (!token) {
-                    alert('LÀM GÌ ĐẤY! Chưa đăng nhập mà đòi vào à?');
+                    document.body.classList.remove('fade-in');
                     window.location.href = 'login.html';
                     return; 
                 }
 
-                let progress = 0;
-                const loadingMessages = [
-                    "ĐANG HACK DATABASE... 10%", "VƯỢT TƯỜNG LỬA... 30%",
-                    "GIẢI MÃ MẬT KHẨU... 50%", "LẤY CẮP DỮ LIỆU... 70%",
-                    "ĐANG CHUYỂN TIỀN... 90%", "HACK THÀNH CÔNG! 100%"
-                ];
-
-                const interval = setInterval(() => {
-                    progress += 20; 
-                    if (progress > 100) progress = 100;
-                    
-                    progressBar.style.width = progress + '%';
-                    loadingText.textContent = loadingMessages[Math.floor((progress - 1) / 20)];
-                    
-                    if (progress >= 100) {
-                        clearInterval(interval);
-                        setTimeout(() => {
-                            loaderContainer.style.display = 'none'; 
-                            mainContent.style.display = 'block'; 
-                            loadRealData();
-                        }, 500);
+                // --- 1. LẤY DỮ LIỆU CÁ NHÂN ---
+                fetch('http://localhost:5000/data', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(response => {
+                    if (!response.ok) { 
+                        throw new Error('Phiên đăng nhập không hợp lệ'); 
                     }
-                }, 500); 
-
-                setInterval(() => {
-                    document.title = (document.title === 'BẠN ĐANG BỊ THEO DÕI') 
-                                     ? '!!! (O_O) !!!' : 'BẠN ĐANG BỊ THEO DÕI';
-                }, 1000); 
-
-                function loadRealData() {
-                    const userDataDiv = document.getElementById('user-data');
-                    const logoutButton = document.getElementById('logout-button');
-                    const showAllButton = document.getElementById('show-all-button');
-                    const tableBody = document.getElementById('all-users-table-body');
-                    const allUsersDataDiv = document.getElementById('all-users-data');
-
-                    fetch('http://localhost:5000/data', {
+                    return response.json();
+                })
+                .then(data => {
+                    welcomeMessage.textContent = `Chào mừng trở lại, ${data.name || data.username}!`;
+                    userDataDiv.innerHTML = `
+                        <ul>
+                            <li><strong>Tên đăng nhập:</strong> ${data.username}</li>
+                            <li><strong>Họ và tên:</strong> ${data.name || 'Chưa cập nhật'}</li>
+                            <li><strong>Lớp:</strong> ${data.class || 'Chưa cập nhật'}</li>
+                        </ul>
+                    `;
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    localStorage.removeItem('access_token');
+                    document.body.classList.remove('fade-in');
+                    window.location.href = 'login.html';
+                });
+                
+                // --- 2. LOGIC NÚT ĐĂNG XUẤT ---
+                logoutButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('access_token');
+                    document.body.classList.remove('fade-in');
+                    setTimeout(() => { window.location.href = 'login.html'; }, 500);
+                });
+                
+                // --- 3. LOGIC NÚT "HIỂN THỊ TẤT CẢ" ---
+                showAllButton.addEventListener('click', () => {
+                    allUsersDataDiv.style.display = 'block';
+                    showAllButton.setAttribute('aria-busy', 'true');
+                    showAllButton.textContent = 'Đang tải...';
+                    tableMessage.classList.remove('show', 'error');
+                    
+                    fetch('http://localhost:5000/admin/all_users', {
                         headers: { 'Authorization': `Bearer ${token}` }
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.message) { 
-                            userDataDiv.innerHTML = `<pre style="color: red;">${data.message}</pre>`;
-                            return;
+                    .then(response => {
+                        if (!response.ok) { 
+                            return response.json().then(err => { throw new Error(err.message); });
                         }
-                        userDataDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                        return response.json();
                     })
-                    .catch(error => { console.error("Error:", error); });
-                    
-                    logoutButton.addEventListener('click', () => {
-                        localStorage.removeItem('access_token');
-                        alert('Đã đăng xuất! Tạm biệt!');
-                        window.location.href = 'login.html';
-                    });
-                    
-                    showAllButton.addEventListener('click', () => {
-                        allUsersDataDiv.style.display = 'block';
-                        tableBody.innerHTML = '<tr><td colspan="4">Đang tải...</td></tr>';
+                    .then(data => {
+                        tableBody.innerHTML = ''; 
+                        if (data.all_users.length === 0) {
+                            tableBody.innerHTML = '<tr><td colspan="4">Không có người dùng nào trong database.</td></tr>';
+                        }
                         
-                        fetch('http://localhost:5000/admin/all_users', {
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.message) { 
-                                tableBody.innerHTML = `<tr><td colspan="4" style="color: red;">${data.message}</td></tr>`;
-                                return;
-                            }
-                            tableBody.innerHTML = '';
-                            data.all_users.forEach(user => {
-                                const row = document.createElement('tr');
-                                row.innerHTML = `
-                                    <td>${user.id}</td>
-                                    <td>${user.username}</td>
-                                    <td>${user.name || 'N/A'}</td>
-                                    <td>${user.class || 'N/A'}</td>
-                                `;
-                                tableBody.appendChild(row);
-                            });
-                        })
-                        .catch(error => { console.error("Error:", error); });
+                        data.all_users.forEach(user => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                fs
+                                <td>${user.id}</td>
+                                <td>${user.username}</td>
+                                <td>${user.name || 'N/A'}</td>
+                                <td>${user.class || 'N/A'}</td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        tableBody.innerHTML = '';
+                        tableMessage.textContent = error.message;
+                        tableMessage.className = 'message error show';
+                    })
+                    .finally(() => {
+                        showAllButton.removeAttribute('aria-busy');
+                        showAllButton.textContent = 'Tải Toàn Bộ Database';
                     });
-                }
+                });
             });
         </script>
     </body>

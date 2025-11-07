@@ -94,14 +94,14 @@ def get_all_users():
 @jwt.unauthorized_loader
 def unauthorized_callback(reason):
     return jsonify({
-        "message": "KHÔNG CÓ VÉ MÀ ĐÒI VÀO À?",
+        "message": "Vui lòng đăng nhập để tiếp tục.",
         "reason": "missing_token"
     }), 401
 
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
     return jsonify({
-        "message": "VÉ GIẢ! ĐỊNH LỪA AI?",
+        "message": "Phiên đăng nhập không hợp lệ hoặc đã hết hạn.",
         "reason": "invalid_token"
     }), 422 
 

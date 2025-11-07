@@ -1,49 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
     <head>
-        <title>Login to see something!</title>
+        <title>Đăng Nhập</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" type="image/x-icon" href="https://tse4.mm.bing.net/th/id/OIP.vA5LHpsWN17cQEV94gJBngHaGG?rs=1&pid=ImgDetMain&o=7&rm=3">
         <link rel="stylesheet" href="style.css">
     </head>
+    
     <body>
-        
-        <div class="container" id="troll-container">
-            <h1>Đăng Nhập Đi Bạn Ơi!</h1>
-            <center><img src="https://e1.pngegg.com/pngimages/252/525/png-clipart-meme-crying-troll-face-illustration.png" width="150" height="150" alt="" class="meme-img"></center>
+        <main class="container animate__animated animate__fadeInUp">
+            
+            <hgroup>
+                <h1>Đăng Nhập</h1>
+                <h2>Vui lòng nhập thông tin của bạn</h2>
+            </hgroup>
             
             <form id="login-form">
-                <label for="username">Tên đăng nhập:</label>
-                <input type="text" id="username" name="username" required placeholder="gõ zô đây...">
+                <label for="username">
+                    Tên đăng nhập
+                    <input type="text" id="username" name="username" placeholder="Tên đăng nhập" required>
+                </label>
                 
-                <label for="password">Mật khẩu:</label>
-                <input type="password" id="password-input" name="password" required placeholder="gõ bí mật zô...">
+                <label for="password">
+                    Mật khẩu
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </label>
                 
-                <input type="submit" value="VÀO!">
+                <button type="submit" id="submit-button">Đăng Nhập</button>
             </form>
             
             <p id="login-message" class="message"></p>
-            <p>Chưa có tài khoản à? <a href="register.html">Bấm đây đăng ký</a>.</p>
-        </div>
+            
+            <footer>
+                <p>Chưa có tài khoản? <a href="register.html">Đăng ký tại đây</a>.</p>
+            </footer>
+        </main>
 
         <script>
             document.addEventListener('DOMContentLoaded', () => {
+                document.body.classList.add('fade-in');
+                
                 const loginForm = document.getElementById('login-form');
                 const loginMessage = document.getElementById('login-message');
-                
-                const failSound = new Audio('bruh.mp3'); 
-                
-                const passwordInput = document.getElementById('password-input');
-                const trollContainer = document.getElementById('troll-container');
-                
-                passwordInput.addEventListener('focus', () => { trollContainer.classList.add('form-shake'); });
-                passwordInput.addEventListener('blur', () => { trollContainer.classList.remove('form-shake'); });
-                
+                const submitButton = document.getElementById('submit-button');
+
                 loginForm.addEventListener('submit', (event) => {
                     event.preventDefault(); 
+                    
+                    submitButton.setAttribute('aria-busy', 'true');
+                    submitButton.textContent = 'Đang kiểm tra...';
+                    loginMessage.classList.remove('show', 'success', 'error');
+                    
                     const username = document.getElementById('username').value;
-                    const password = document.getElementById('password-input').value;
+                    const password = document.getElementById('password').value;
 
                     fetch('http://localhost:5000/login', {
                         method: 'POST',
@@ -55,18 +64,26 @@
                         loginMessage.textContent = data.message; 
                         
                         if (data.access_token) { 
-                            loginMessage.className = 'message success';
+                            loginMessage.className = 'message success show';
                             localStorage.setItem('access_token', data.access_token);
-                            setTimeout(() => { window.location.href = "main.html"; }, 1000);
+                            
+                            document.body.classList.remove('fade-in');
+                            setTimeout(() => { 
+                                window.location.href = "main.html"; 
+                            }, 500);
+                            
                         } else {
-                            loginMessage.className = 'message error';
-                            failSound.play(); 
-                            trollContainer.classList.add('form-shake'); 
+                            loginMessage.className = 'message error show';
                         }
                     })
-                    .catch(error => { 
+                    .catch(error => {
                         console.error('Error:', error);
-                        failSound.play(); 
+                        loginMessage.textContent = 'Lỗi kết nối máy chủ.';
+                        loginMessage.className = 'message error show';
+                    })
+                    .finally(() => {
+                        submitButton.removeAttribute('aria-busy');
+                        submitButton.textContent = 'Đăng Nhập';
                     });
                 });
             });

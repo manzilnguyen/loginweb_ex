@@ -1,21 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
     <head>
-        <title>Nothing ok!</title>
+        <title>Trang Chủ</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" type="image/x-icon" href="https://tse4.mm.bing.net/th/id/OIP.vA5LHpsWN17cQEV94gJBngHaGG?rs=1&pid=ImgDetMain&o=7&rm=3">
+        <meta name="description" content="Trang chủ dự án">
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div class="container">
-            <h1>Ê! ĐI ĐÂU ĐẤY?</h1>
-            <p>Ở đây không có gì đâu. Biến đi.</p>
-            <center><img src="https://tse4.mm.bing.net/th/id/OIP.vA5LHpsWN17cQEV94gJBngHaGG?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Nothing to see here" class="meme-img" /></center>
-            <p>Muốn thấy "điều thú vị"? <a href="login.html">Bấm vào đây nè</a>.</p>
-        </div>
+        <main class="container animate__animated animate__fadeInUp">
+            <header>
+                <hgroup>
+                    <h1>Chào mừng bạn!</h1>
+                    <h2>Đây là trang chủ của dự án.</h2>
+                </hgroup>
+            </header>
+            
+            <p>Nội dung ở đây là công khai. Để truy cập các tính năng chính, vui lòng đăng nhập hoặc đăng ký.</p>
+            
+            <figure>
+                <img src="https://img.freepik.com/free-vector/data-points-concept-illustration_114360-1090.jpg" alt="Ảnh minh họa" style="border-radius: var(--pico-border-radius);">
+                <figcaption>Ảnh minh họa về dữ liệu</figcaption>
+            </figure>
+            
+            <div class="grid">
+                <a href="login.html" role="button">Đi đến trang Đăng Nhập</a>
+                <a href="register.html" role="button" class="secondary">Đăng Ký Tài Khoản</a>
+            </div>
+            
+        </main>
         <script>
-            console.log("%cWARNING: ĐÃ XÂM NHẬP VÙNG CẤM!", "color: red; font-family: 'Comic Sans MS'; font-size: 20px; font-weight: bold;");
+            document.addEventListener('DOMContentLoaded', () => {
+                document.body.classList.add('fade-in');
+                console.log("Trang chủ đã tải.");
+            });
         </script>
     </body>
 </html>
